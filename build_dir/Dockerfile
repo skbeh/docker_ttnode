@@ -18,7 +18,7 @@ RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.gi
     cd linux-stable && \
     mkdir -p /build_glibc/header && \
     make headers_install INSTALL_HDR_PATH="/build_glibc/header"
-ENV PATH="/proton-clang:/usr/local/bin:/usr/bin:/bin"
+ENV PATH="/proton-clang/bin:/usr/local/bin:/usr/bin:/bin"
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
     cd build_glibc && \
