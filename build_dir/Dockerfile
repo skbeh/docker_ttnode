@@ -5,7 +5,7 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get update && \
     apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison -y --no-install-recommends
 
-RUN git clone --depth=1 https://gitclone.com/github.com/kdrag0n/proton-clang.git
+ADD https://codeload.github.com/kdrag0n/proton-clang/tar.gz/master /proton-clang
 
 # http://www.acme.com/software/thttpd/
 #RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
