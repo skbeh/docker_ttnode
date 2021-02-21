@@ -1,9 +1,9 @@
-FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
+FROM debian:stable-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install build-essential git ca-certificates wget gnupg2 -y --no-install-recommends && \
+    apt-get install build-essential git ca-certificates wget gnupg2 rsync -y --no-install-recommends && \
     wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
     echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster main' >> /etc/apt/sources.list && \
     apt-get update && \
