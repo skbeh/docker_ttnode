@@ -9,52 +9,42 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
 	
 # http://www.acme.com/software/thttpd/
 RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
-    tar -zxvf ./thttpd-2.29.tar.gz && \
+    tar -zxvf thttpd-2.29.tar.gz && \
     cd thttpd-2.29 && \
     ./configure && \
     make
 
-FROM --platform=$TARGETPLATFORM debian:stable-slim
+RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.git && \
+    cd linux-stable && \
+    make headers_install INSTALL_HDR_PATH="/build_glibc/header"
 
-LABEL maintainer="eric <ericwang2006@gmail.com>"
+RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
+    tar -Jxf glibc-2.33.tar.xz && \
+    mkdir build_glibc && \
+    cd build_glibc && \
+    CC=clang-12 LD=ld.lld-12 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
+    make -j$(nproc) && \
+    mkdir /container && \
+    make install DESTDIR=/container
+
+RUN wget https://ftp.cn.debian.org/debian/pool/main/g/gcc-10/libstdc++6_10.2.1-6_arm64.deb && \
+    mkdir libstdc++ && \
+    dpkg-deb -R libstdc++6_10.2.1-6_arm64.deb libstdc++ && \
+    cp -r libstdc++/usr/* /container/usr/
+
+FROM scratch
+
+#LABEL maintainer="eric <ericwang2006@gmail.com>"
+
+COPY --from=builder /container/* /
+
+ADD https://github.com/multiarch/qemu-user-static/releases/latest/download/qemu-arm-static /qemu-arm-static
+ADD https://raw.githubusercontent.com/ericwang2006/docker_ttnode/master/aarch64/ttnode /ttnode
 
 ENV TZ=Asia/Shanghai
-ENV LANG C.UTF-8
-ARG EMULATION_PLATFORM=arm32
-
-# cron模式
-# RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    # sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    # apt-get update && apt-get install cron procps net-tools nano -y --no-install-recommends && \
-    # crontab /usr/node/crontab_list.sh && \
-    # echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
-    # apt-get clean && \
-    # apt-get purge -y --auto-remove
-# CMD ["cron", "-f"]
-
-# 由于alpine的libc库有问题不能跑ttnode
-# RUN echo "* * * * * /usr/node/crash_monitor.sh" > /etc/crontabs/root && \
-# echo "http://mirrors.aliyun.com/alpine/edge/main" > /etc/apk/repositories && \
-# echo "http://mirrors.aliyun.com/alpine/edge/community" >> /etc/apk/repositories && \
-# apk update && apk add bash g++ libc6-compat
-
-# start.sh用脚本监控ttnode进程,不用cron
-RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    apt-get update && apt-get install openssl cron procps net-tools iputils-ping ca-certificates curl jq nano bc -y --no-install-recommends && \
-    echo "alias ls='ls --color=auto'" >> ~/.bashrc && \
-	ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
-	echo 'Asia/Shanghai' >/etc/timezone && \
-    rm -rf /var/lib/apt/lists/*
-
-COPY . /usr/node/
-COPY --from=builder /thttpd-2.29/thttpd /usr/node/
-RUN /usr/node/init_arch.sh && rm /usr/node/init_arch.sh && rm /usr/node/Dockerfile
-
-WORKDIR /usr/node
-
-EXPOSE 1043
+ENV LANG=C.UTF-8
 
 VOLUME ["/config"]
 
-CMD ["/usr/node/start.sh"]
+ENTRYPOINT ["/qemu-aarch64-static"]
+CMD ["/ttnode","-p","/mnts"]
