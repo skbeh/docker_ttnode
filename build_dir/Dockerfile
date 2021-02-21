@@ -5,16 +5,16 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get update && \
     apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison -y --no-install-recommends && \
     wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster main' >> /etc/apt/sources.list && \
+    echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster-11 main' >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y clang-13 lld-13
+    apt-get install -y clang-11 lld-11
 
 # http://www.acme.com/software/thttpd/
-RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
-    tar -zxvf thttpd-2.29.tar.gz && \
-    cd thttpd-2.29 && \
-    ./configure && \
-    make
+#RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
+#    tar -zxvf thttpd-2.29.tar.gz && \
+#    cd thttpd-2.29 && \
+#    ./configure && \
+#    make
 
 RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.git && \
     cd linux-stable && \
@@ -24,7 +24,7 @@ RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.gi
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
     cd build_glibc && \
-    CC=clang-13 CXX=clang++ LD=ld.lld-13 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
+    CC=clang-11 CXX="clang++-11" LD=ld.lld-11 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
     make -j$(nproc) && \
     mkdir /container && \
     make install DESTDIR=/container
