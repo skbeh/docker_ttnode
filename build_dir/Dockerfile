@@ -18,11 +18,11 @@ RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
 
 RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.git && \
     cd linux-stable && \
+    mkdir -p /build_glibc/header
     make headers_install INSTALL_HDR_PATH="/build_glibc/header"
 
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
-    mkdir build_glibc && \
     cd build_glibc && \
     CC=clang-13 LD=ld.lld-13 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
     make -j$(nproc) && \
