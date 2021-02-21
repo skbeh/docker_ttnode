@@ -3,11 +3,9 @@ FROM debian:stable-slim AS builder
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison -y --no-install-recommends && \
-    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster-11 main' >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get install -y clang-11 lld-11
+    apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison -y --no-install-recommends
+
+RUN git clone --depth=1 https://gitclone.com/github.com/kdrag0n/proton-clang.git
 
 # http://www.acme.com/software/thttpd/
 #RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
@@ -20,11 +18,11 @@ RUN git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/linux-stable.gi
     cd linux-stable && \
     mkdir -p /build_glibc/header && \
     make headers_install INSTALL_HDR_PATH="/build_glibc/header"
-
+ENV PATH="/proton-clang:/usr/local/bin:/usr/bin:/bin"
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
     cd build_glibc && \
-    CC=clang-11 CXX="clang++-11" LD=ld.lld-11 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
+    CC=clang CXX=clang++ LD=ld.lld LLVM=1 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
     make -j$(nproc) && \
     mkdir /container && \
     make install DESTDIR=/container
