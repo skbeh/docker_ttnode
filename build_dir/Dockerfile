@@ -2,8 +2,10 @@ FROM --platform=$TARGETPLATFORM debian:stable-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
+    echo 'deb http://apt.llvm.org/buster/ llvm-toolchain-buster-12 main' >> /etc/apt/sources.list && \
+    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
     apt-get update && \
-	apt-get install build-essential git ca-certificates wget -y --no-install-recommends
+    apt-get install build-essential git ca-certificates wget clang-12 lld-12 -y --no-install-recommends
 	
 # http://www.acme.com/software/thttpd/
 RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
