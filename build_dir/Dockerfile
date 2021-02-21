@@ -40,7 +40,7 @@ FROM scratch
 
 COPY --from=builder /container/* /
 
-ADD https://github.com/multiarch/qemu-user-static/releases/latest/download/qemu-arm-static /qemu-arm-static
+ADD https://github.com/multiarch/qemu-user-static/releases/latest/download/qemu-aarch64-static /qemu-aarch64-static
 ADD https://raw.githubusercontent.com/ericwang2006/docker_ttnode/master/aarch64/ttnode /ttnode
 
 ENV TZ=Asia/Shanghai
