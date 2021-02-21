@@ -24,8 +24,8 @@ ENV PATH="/proton-clang/bin:/usr/local/bin:/usr/bin:/bin"
 RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
     cd build_glibc && \
-    export CC=clang CXX=clang++ LD=ld.lld LLVM=1 && \
-    /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-unknown-linux-gnu && \
+    export CC=clang CXX=clang++ LD=ld.lld LLVM=1 CFLAGS='-O2 -target aarch64-linux-gnu' && \
+    /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
     make -j$(nproc) && \
     mkdir /container && \
     make install DESTDIR=/container
