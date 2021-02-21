@@ -5,9 +5,9 @@ RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list &
     apt-get update && \
     apt-get install build-essential git ca-certificates wget gnupg2 -y --no-install-recommends && \
     wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-    echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster-12 main' >> /etc/apt/sources.list && \
+    echo 'deb https://mirrors.bfsu.edu.cn/llvm-apt/buster/ llvm-toolchain-buster main' >> /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install -y clang-12 lld-12
+    apt-get install -y clang-13 lld-13
 
 # http://www.acme.com/software/thttpd/
 RUN wget http://www.acme.com/software/thttpd/thttpd-2.29.tar.gz && \
@@ -24,7 +24,7 @@ RUN wget https://mirrors.tuna.tsinghua.edu.cn/gnu/glibc/glibc-2.33.tar.xz && \
     tar -Jxf glibc-2.33.tar.xz && \
     mkdir build_glibc && \
     cd build_glibc && \
-    CC=clang-12 LD=ld.lld-12 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
+    CC=clang-13 LD=ld.lld-13 /glibc-2.33/configure --enable-kernel=4.4 --without-selinux --prefix=/usr --with-headers=./header --host=aarch64-linux-gnu && \
     make -j$(nproc) && \
     mkdir /container && \
     make install DESTDIR=/container
