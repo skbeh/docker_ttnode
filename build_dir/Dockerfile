@@ -3,7 +3,7 @@ FROM debian:stable-slim AS builder
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     apt-get update && \
-    apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison -y --no-install-recommends
+    apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison python3 -y --no-install-recommends
 
 RUN git clone --depth=1 https://github.com.cnpmjs.org/kdrag0n/proton-clang.git
 
