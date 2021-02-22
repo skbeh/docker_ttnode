@@ -2,7 +2,7 @@ FROM debian:stable-slim AS builder
 
 RUN sed -i 's/security.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
     sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && \
-    dpkg --add-architecture arm64
+    dpkg --add-architecture arm64 && \
     apt-get update && \
     apt-get install build-essential git ca-certificates wget gnupg2 rsync gawk bison python3 crossbuild-essential-aarch64 -y --no-install-recommends
 
